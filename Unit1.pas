@@ -10,7 +10,8 @@ uses
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.Phys.MSAcc, FireDAC.Phys.MSAccDef, FireDAC.VCLUI.Wait,
   FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, Data.DB,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.Buttons, Vcl.Grids, Vcl.DBGrids,
+  Vcl.ExtCtrls;
 
 type
   TContatos = class(TForm)
@@ -29,12 +30,19 @@ type
     DataSource1: TDataSource;
     btnNovo: TButton;
     btnSalvar: TButton;
-    lblConexao: TLabel;
     btnFrente: TButton;
     btnPTraz: TButton;
     btnExcluir: TButton;
     btnEditar: TButton;
     btnCancelar: TButton;
+    txtPesquisa: TEdit;
+    btnPesquisar: TSpeedButton;
+    lblConexao: TLabel;
+    DBGrid1: TDBGrid;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    imgFoto: TImage;
+    OpenDialog: TOpenDialog;
     procedure carrega;
     procedure limpa;
     procedure bloqueia;
@@ -47,6 +55,9 @@ type
     procedure btnExcluirClick(Sender: TObject);
     procedure btnEditarClick(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
+    procedure btnPesquisarClick(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
 
   private
     { Private declarations }
@@ -71,6 +82,21 @@ begin
   txtEmail.Text := '';
   txtObservacao.Text := '';
 
+end;
+
+procedure TContatos.SpeedButton1Click(Sender: TObject);
+begin
+    contatos.close;
+end;
+
+procedure TContatos.SpeedButton2Click(Sender: TObject);
+begin
+OpenDialog.Execute();
+//ShowMessage(OpenDialog.FileName);
+imgFoto.Picture.LoadFromFile(OpenDialog.FileName);
+FDcontatos.Edit;
+FDcontatos.FieldByName('foto').Value := OpenDialog.FileName;
+FDcontatos.Post;
 end;
 
 procedure TContatos.bloqueia;
@@ -115,6 +141,15 @@ begin
   bloqueia;
 end;
 
+procedure TContatos.btnPesquisarClick(Sender: TObject);
+begin
+if FDcontatos.FindKey([txtPesquisa.Text]) then
+      carrega
+      else
+      ShowMessage('Contato não encontrado');
+
+end;
+
 procedure TContatos.btnPTrazClick(Sender: TObject);
 begin
   FDcontatos.Prior;
@@ -130,7 +165,7 @@ end;
 
 procedure TContatos.carrega;
 var
-  idValue, nomeValue, emailValue, telefoneValue, observacaoValue: Variant;
+  idValue, nomeValue, emailValue, telefoneValue, observacaoValue, fotoValue: Variant;
 begin
   idValue := FDcontatos.FieldByName('id').Value;
   if idValue <> null then
@@ -161,6 +196,8 @@ begin
     txtObservacao.Text := observacaoValue
   else
     txtObservacao.Text := '';
+
+
 end;
 
 procedure TContatos.FDcontatosBeforePost(DataSet: TDataSet);
