@@ -10,7 +10,8 @@ uses
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.Phys.MSAcc, FireDAC.Phys.MSAccDef, FireDAC.VCLUI.Wait,
   FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, Data.DB,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.Buttons, Vcl.Grids, Vcl.DBGrids,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.Buttons, Vcl.Grids,
+  Vcl.DBGrids,
   Vcl.ExtCtrls;
 
 type
@@ -69,7 +70,6 @@ var
   Contatos: TContatos;
   estado: Boolean;
 
-
 implementation
 
 {$R *.dfm}
@@ -81,22 +81,23 @@ begin
   txtTelefone.Text := '';
   txtEmail.Text := '';
   txtObservacao.Text := '';
+  imgFoto.Picture:= nil ;
 
 end;
 
 procedure TContatos.SpeedButton1Click(Sender: TObject);
 begin
-    contatos.close;
+  Contatos.close;
 end;
 
 procedure TContatos.SpeedButton2Click(Sender: TObject);
 begin
-OpenDialog.Execute();
-//ShowMessage(OpenDialog.FileName);
-imgFoto.Picture.LoadFromFile(OpenDialog.FileName);
-FDcontatos.Edit;
-FDcontatos.FieldByName('foto').Value := OpenDialog.FileName;
-FDcontatos.Post;
+  OpenDialog.Execute();
+  // ShowMessage(OpenDialog.FileName);
+  imgFoto.Picture.LoadFromFile(OpenDialog.FileName);
+  FDcontatos.Edit;
+  FDcontatos.FieldByName('foto').Value := OpenDialog.FileName;
+  FDcontatos.Post;
 end;
 
 procedure TContatos.bloqueia;
@@ -109,18 +110,17 @@ end;
 
 procedure TContatos.btnCancelarClick(Sender: TObject);
 begin
-limpa;
-carrega;
+  limpa;
+  carrega;
 
-bloqueia;
-
+  bloqueia;
 
 end;
 
 procedure TContatos.btnEditarClick(Sender: TObject);
 begin
-bloqueia;
-FDcontatos.Edit;
+  bloqueia;
+  FDcontatos.Edit;
 end;
 
 procedure TContatos.btnExcluirClick(Sender: TObject);
@@ -143,10 +143,10 @@ end;
 
 procedure TContatos.btnPesquisarClick(Sender: TObject);
 begin
-if FDcontatos.FindKey([txtPesquisa.Text]) then
-      carrega
-      else
-      ShowMessage('Contato não encontrado');
+  if FDcontatos.FindKey([txtPesquisa.Text]) then
+    carrega
+  else
+    ShowMessage('Contato não encontrado');
 
 end;
 
@@ -160,12 +160,13 @@ procedure TContatos.btnSalvarClick(Sender: TObject);
 begin
   FDcontatos.Post;
   bloqueia;
-  ShowMessage('dasos gravados');
+  ShowMessage('dados gravados');
 end;
 
 procedure TContatos.carrega;
 var
-  idValue, nomeValue, emailValue, telefoneValue, observacaoValue, fotoValue: Variant;
+  idValue, nomeValue, emailValue, telefoneValue, observacaoValue,
+    fotoValue: Variant;
 begin
   idValue := FDcontatos.FieldByName('id').Value;
   if idValue <> null then
@@ -197,6 +198,14 @@ begin
   else
     txtObservacao.Text := '';
 
+  fotoValue := FDcontatos.FieldByName('foto').Value;
+  if fotoValue <> null then
+  begin
+    if FileExists(fotoValue) then
+      imgFoto.Picture.LoadFromFile(fotoValue)
+  end
+  else
+    imgFoto.Picture := nil;
 
 end;
 
